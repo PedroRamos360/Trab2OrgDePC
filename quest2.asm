@@ -1,5 +1,5 @@
 .data
-x: .float 1.0472
+x: .float 57.23
 index: .float 2
 resultado: .float 1
 incremento: .float 2
@@ -8,6 +8,8 @@ criterio_de_parada: .float 1
 conversion: .word 0
 zero: .float 0
 expoente: .word 0
+pi: .float 3.1415926535
+graus180: .float 180
 
 
 .text
@@ -26,9 +28,9 @@ expoente: .word 0
 
 .macro factorial($number)
     l.s $f10, resultado
-    li $t0, 1 # index para verificar parada do loop
+    li $t0, 2 # index para verificar parada do loop
     loop:
-        beq $number, $t0, endloop 
+        blt $number, $t0, endloop 
     	mtc1 $t0, $f11
     	cvt.s.w $f11, $f11
         mul.s $f10, $f10, $f11    
@@ -53,7 +55,7 @@ cosseno:
        	sw $s0, expoente
         power # Recebe apenas o parametro expoente já que a base sempre será x para esse programa
         mov.s $f5, $f30 # $s3 = x^index
-        factorial($t0)
+        factorial($s0)
         mov.s $f6, $f30 # $s4 = fatorial(index)
         div.s $f5 $f5, $f6 # realiza a divisão e armazena em $f5
         sub.s $f3, $f3, $f5
@@ -68,7 +70,13 @@ cosseno:
     
 
 main:
-    l.s $f0, x
+    l.s $f0, x # x em graus
+    l.s $f1, pi 
+    l.s $f2, graus180
+    mul.s $f0, $f0, $f1 # multiplica x por pi
+    div.s $f0, $f0, $f2 # divide x por 180
+    
+    
     jal cosseno
     mov.s $f1, $f30
     li $v0, 2
